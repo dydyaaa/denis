@@ -1,9 +1,7 @@
 import telebot
 import math
-import additional as dop
 import buttons as btn
 import cfg
-import rub_rate as rt
 
 
 bot = telebot.TeleBot(cfg.TOKEN)
@@ -34,23 +32,25 @@ def process_number(message):
 # Функция с формулами рассчета цен. Можно вывести в отдельный файл для удобства
 def perform_operation(number):
     if current_value == "👟Кроссовки":
-        return math.ceil(number * rt.get_rub_rate())
+        return math.ceil(number * cfg.get_rub_rate())
     elif current_value == "🧦Носки":
-        return math.ceil(number * (rt.get_rub_rate() + 1) + 1000)
+        return math.ceil(number * (cfg.get_rub_rate() + 1) + 1000)
     else:
         return math.ceil(number)
 
 @bot.message_handler(func=lambda message: True)
 def menu(message):
     if message.text == "💵Актуальный курс":
-        mes = f'Текущий курс Юаня: {rt.get_rub_rate()}'
+        mes = f'Текущий курс Юаня: {cfg.get_rub_rate()}'
         bot.send_message(message.chat.id, mes)
     elif message.text == "❓Вопросы и ответы":
-        bot.send_message(message.chat.id, dop.faq)
-    # elif message.text == "🛒Каталог":
-    #     bot.send_message(message.chat.id, "Выберете интересующую вас категорию", reply_markup=btn.cartbtn)
+        bot.send_message(message.chat.id, cfg.faq)
+    elif message.text == "🛒Каталог":
+        bot.send_message(message.chat.id, "Выберете интересующую вас категорию", reply_markup=btn.cartbtn)
+        current_catalog_category = None
+        catalog_mode = True
     elif message.text == "📲Отзывы":
-        bot.send_message(message.chat.id, dop.otzv)
+        bot.send_message(message.chat.id, cfg.otzv)
     elif message.text == "📞Связь с менеджером":
         bot.send_message(message.chat.id, "6")
     elif message.text == "⬅️Назад":
