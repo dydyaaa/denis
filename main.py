@@ -11,15 +11,20 @@ def send_welcome(message):
     bot.send_message(message.chat.id, "Привет! Это пример стартового сообщения.", reply_markup=btn.strbtn)
     
 @bot.message_handler(func=lambda message: message.text == "💲Рассчитать стоимость")
-def handle_calculate_cost(message):
+def handle_calculate_cost(message): 
+    global catalog_mode
+    catalog_mode = False
     bot.send_message(message.chat.id, "Выберите категорию товара:", reply_markup=btn.cartbtn)
 
 @bot.message_handler(func=lambda message: message.text in ["👟Кроссовки", "🧥Верхняя одежда", "🧦Носки", "👖Толстовки/Штаны", "👕Футболки/Шорты", "🧣Аксессуары"])
 def handle_product_category(message):
     global current_value 
     current_value = message.text
-    bot.send_message(message.chat.id, "Введите стоимость в Юанях:")
-    bot.register_next_step_handler(message, process_number)
+    if catalog_mode == False:
+        bot.send_message(message.chat.id, "Введите стоимость в Юанях:")
+        bot.register_next_step_handler(message, process_number)
+    elif catalog_mode == True:
+        bot.send_message(message.chat.id, "каталог")
 
 def process_number(message):
     try:
@@ -28,6 +33,7 @@ def process_number(message):
         bot.send_message(message.chat.id, f"Стоимость в рублях: {result}")
     except ValueError:
         bot.send_message(message.chat.id, "Пожалуйста, введите корректное число.")
+        handle_product_category(message)
 
 # Функция с формулами рассчета цен. Можно вывести в отдельный файл для удобства
 def perform_operation(number):
@@ -46,13 +52,13 @@ def menu(message):
     elif message.text == "❓Вопросы и ответы":
         bot.send_message(message.chat.id, cfg.faq)
     elif message.text == "🛒Каталог":
-        bot.send_message(message.chat.id, "Выберете интересующую вас категорию", reply_markup=btn.cartbtn)
-        current_catalog_category = None
+        global catalog_mode
         catalog_mode = True
+        bot.send_message(message.chat.id, f"Выберете интересующую вас категорию {catalog_mode}", reply_markup=btn.cartbtn)
     elif message.text == "📲Отзывы":
-        bot.send_message(message.chat.id, cfg.otzv)
+        bot.send_message(message.chat.id, f"Бим бам\n[Ваш текст]({cfg.otzv})", parse_mode="Markdown")
     elif message.text == "📞Связь с менеджером":
-        bot.send_message(message.chat.id, "6")
+        bot.send_message(message.chat.id, f"Бим бам\n[Ваш текст]({cfg.help})", parse_mode="Markdown")
     elif message.text == "⬅️Назад":
         send_welcome(message)
     else:
