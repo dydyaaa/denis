@@ -8,23 +8,18 @@ bot = telebot.TeleBot(cfg.TOKEN)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, "Привет! Это пример стартового сообщения.", reply_markup=btn.strbtn)
+    bot.send_message(message.chat.id, f"Привет! Это пример стартового сообщения.", reply_markup=btn.strbtn)
     
 @bot.message_handler(func=lambda message: message.text == "💲Рассчитать стоимость")
-def handle_calculate_cost(message): 
-    global catalog_mode
-    catalog_mode = False
+def handle_calculate_cost(message):
     bot.send_message(message.chat.id, "Выберите категорию товара:", reply_markup=btn.cartbtn)
 
 @bot.message_handler(func=lambda message: message.text in ["👟Кроссовки", "🧥Верхняя одежда", "🧦Носки", "👖Толстовки/Штаны", "👕Футболки/Шорты", "🧣Аксессуары"])
 def handle_product_category(message):
     global current_value 
     current_value = message.text
-    if catalog_mode == False:
-        bot.send_message(message.chat.id, "Введите стоимость в Юанях:")
-        bot.register_next_step_handler(message, process_number)
-    elif catalog_mode == True:
-        bot.send_message(message.chat.id, "каталог")
+    bot.send_message(message.chat.id, "Введите стоимость в Юанях:")
+    bot.register_next_step_handler(message, process_number)
 
 def process_number(message):
     try:
@@ -38,6 +33,7 @@ def process_number(message):
 # Функция с формулами рассчета цен. Можно вывести в отдельный файл для удобства
 def perform_operation(number):
     if current_value == "👟Кроссовки":
+        1.1 * (number * 2) + 15 * 2 + 775 * 2.25
         return math.ceil(number * cfg.get_rub_rate())
     elif current_value == "🧦Носки":
         return math.ceil(number * (cfg.get_rub_rate() + 1) + 1000)
@@ -51,10 +47,6 @@ def menu(message):
         bot.send_message(message.chat.id, mes)
     elif message.text == "❓Вопросы и ответы":
         bot.send_message(message.chat.id, cfg.faq)
-    elif message.text == "🛒Каталог":
-        global catalog_mode
-        catalog_mode = True
-        bot.send_message(message.chat.id, f"Выберете интересующую вас категорию {catalog_mode}", reply_markup=btn.cartbtn)
     elif message.text == "📲Отзывы":
         bot.send_message(message.chat.id, f"Бим бам\n[Ваш текст]({cfg.otzv})", parse_mode="Markdown")
     elif message.text == "📞Связь с менеджером":

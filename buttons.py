@@ -20,5 +20,5 @@ btnn5 = telebot.types.KeyboardButton(text="👕Футболки/Шорты")
 btnn6 = telebot.types.KeyboardButton(text="🧣Аксессуары")
 btnn7 = telebot.types.KeyboardButton(text="⬅️Назад")
 
-strbtn.add(btn1, btn2, btn3, btn4, btn5, btn6)
+strbtn.add(btn1, btn2, btn3, btn5, btn6)
 cartbtn.add(btnn1, btnn2, btnn3, btnn4, btnn5, btnn6, btnn7)
