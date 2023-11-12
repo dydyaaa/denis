@@ -6,6 +6,7 @@ import os
 
 
 hello_photo = os.getcwd() + '/image/123.jpeg'
+rub_rate = cfg.get_rub_rate()
 bot = telebot.TeleBot(cfg.TOKEN)
 
 @bot.message_handler(commands=['start'])
@@ -43,10 +44,19 @@ def perform_operation(number):
     else:
         return math.ceil(number)
 
+@bot.message_handler(commands=['setrub'])
+def rub(message):
+    bot.send_message(message.chat.id, f'Введите курс Юаня:')
+    bot.register_next_step_handler(message, rub)
+
+def rub(message):
+    rub_rate = float(message.text)
+    bot.send_message(message.chat.id, f'курс обновлен {rub_rate}')
+
 @bot.message_handler(func=lambda message: True)
 def menu(message):
     if message.text == "💵Актуальный курс":
-        mes = f'Текущий курс Юаня: {cfg.get_rub_rate()}'
+        mes = f'Текущий курс Юаня: {rub_rate}'
         bot.send_message(message.chat.id, mes)
     elif message.text == "❓Вопросы и ответы":
         bot.send_message(message.chat.id, cfg.faq)
